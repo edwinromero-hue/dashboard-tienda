@@ -1,110 +1,215 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils/cn';
 
-// Categorías colombianas de retail local con imágenes Unsplash estables.
-const CATEGORIES = [
+interface BigCategory {
+  name: string;
+  titleLines: string[];
+  bg: string;
+  titleColor: string;
+  image: string;
+  imageAlt: string;
+}
+
+const CATEGORIES: BigCategory[] = [
   {
     name: 'Frutas',
-    image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=400&q=80',
-    tint: 'from-red-100',
+    titleLines: ['Encuentra', 'frutas frescas'],
+    bg: 'bg-emerald-100',
+    titleColor: 'text-emerald-950',
+    image: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=720&q=80',
+    imageAlt: 'Frutas frescas',
   },
   {
     name: 'Lácteos',
-    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80',
-    tint: 'from-blue-100',
+    titleLines: ['Lácteos', 'del día'],
+    bg: 'bg-sky-100',
+    titleColor: 'text-sky-950',
+    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=720&q=80',
+    imageAlt: 'Lácteos del día',
   },
   {
     name: 'Bebidas',
-    image: 'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=400&q=80',
-    tint: 'from-amber-100',
+    titleLines: ['Bebidas', 'para refrescar'],
+    bg: 'bg-amber-100',
+    titleColor: 'text-amber-950',
+    image: 'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=720&q=80',
+    imageAlt: 'Bebidas',
   },
   {
     name: 'Snacks',
-    image: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=400&q=80',
-    tint: 'from-orange-100',
+    titleLines: ['Snacks', 'favoritos'],
+    bg: 'bg-orange-100',
+    titleColor: 'text-orange-950',
+    image: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=720&q=80',
+    imageAlt: 'Snacks',
   },
   {
     name: 'Carnes',
-    image: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=400&q=80',
-    tint: 'from-rose-100',
+    titleLines: ['Carnes', 'premium'],
+    bg: 'bg-rose-100',
+    titleColor: 'text-rose-950',
+    image: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=720&q=80',
+    imageAlt: 'Carnes premium',
   },
   {
     name: 'Aseo',
-    image: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=400&q=80',
-    tint: 'from-teal-100',
+    titleLines: ['Productos', 'para el hogar'],
+    bg: 'bg-teal-100',
+    titleColor: 'text-teal-950',
+    image: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=720&q=80',
+    imageAlt: 'Productos de aseo',
   },
   {
     name: 'Panadería',
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80',
-    tint: 'from-amber-100',
+    titleLines: ['Pan recién', 'horneado'],
+    bg: 'bg-yellow-100',
+    titleColor: 'text-yellow-950',
+    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=720&q=80',
+    imageAlt: 'Panadería',
   },
   {
     name: 'Granos',
-    image: 'https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?w=400&q=80',
-    tint: 'from-yellow-100',
+    titleLines: ['Granos', 'selectos'],
+    bg: 'bg-stone-100',
+    titleColor: 'text-stone-950',
+    image: 'https://images.unsplash.com/photo-1568909344668-6f14a07b56a0?w=720&q=80',
+    imageAlt: 'Granos',
   },
 ];
 
+// Velocidad del autoscroll en píxeles por segundo
+const AUTO_SPEED_PX_S = 60;
+// Pausa después de la última interacción del usuario
+const RESUME_DELAY_MS = 2500;
+
 export function PopularCategoriesCard() {
-  // Duplicamos el array para que el loop del marquee sea perfecto: cuando llega
-  // a -50% de translateX, las copias 7-12 ocupan el lugar de las 1-6 sin saltos.
+  // Duplicamos para hacer loop infinito sin saltos visibles.
   const items = [...CATEGORIES, ...CATEGORIES];
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const lastInteractionRef = useRef(0);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    let raf = 0;
+    let last = performance.now();
+
+    const tick = (now: number) => {
+      const dt = now - last;
+      last = now;
+
+      // Autoscroll solo si el usuario no ha interactuado recientemente
+      if (now - lastInteractionRef.current > RESUME_DELAY_MS) {
+        el.scrollLeft += (AUTO_SPEED_PX_S * dt) / 1000;
+      }
+
+      // Loop: cuando llegamos a la mitad (donde empiezan las copias),
+      // reseteamos al inicio. Como el contenido es idéntico, no se nota.
+      const half = el.scrollWidth / 2;
+      if (el.scrollLeft >= half) {
+        el.scrollLeft -= half;
+      } else if (el.scrollLeft < 0) {
+        el.scrollLeft += half;
+      }
+
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+
+    // Detección de interacción del usuario (no de scroll programático)
+    const onUserInteract = () => {
+      lastInteractionRef.current = performance.now();
+    };
+    el.addEventListener('pointerdown', onUserInteract);
+    el.addEventListener('wheel', onUserInteract, { passive: true });
+    el.addEventListener('touchstart', onUserInteract, { passive: true });
+    el.addEventListener('touchmove', onUserInteract, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      el.removeEventListener('pointerdown', onUserInteract);
+      el.removeEventListener('wheel', onUserInteract);
+      el.removeEventListener('touchstart', onUserInteract);
+      el.removeEventListener('touchmove', onUserInteract);
+    };
+  }, []);
 
   return (
-    <section className="overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-sm">
-      <header className="flex items-baseline justify-between px-5 pt-5 pb-3">
+    <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-sm">
+      <header className="flex shrink-0 items-baseline justify-between px-5 pt-5 pb-3">
         <h3 className="text-[16px] font-black tracking-tight text-brand-900">
           Categorías populares
         </h3>
         <span className="text-[10px] font-semibold uppercase tracking-widest text-brand-400">
-          {CATEGORIES.length} categorías
+          {CATEGORIES.length} colecciones
         </span>
       </header>
 
-      {/* Marquee horizontal infinito (pausa en hover/touch) */}
-      <div className="group relative pb-5">
-        {/* Edge fades para sugerir continuidad */}
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-white to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-white to-transparent" />
-
-        <div className="flex w-fit gap-4 px-5 animate-marquee-x group-hover:[animation-play-state:paused] group-active:[animation-play-state:paused]">
-          {items.map((c, i) => (
-            <CategoryCircle key={`${c.name}-${i}`} category={c} />
-          ))}
-        </div>
+      {/* Carrusel: autoscroll JS + scroll manual con dedo/mouse */}
+      <div
+        ref={scrollRef}
+        className="flex min-h-0 flex-1 cursor-grab gap-3 overflow-x-auto overflow-y-hidden px-3 pb-4 active:cursor-grabbing"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {items.map((c, i) => (
+          <BigCategoryCard key={`${c.name}-${i}`} category={c} />
+        ))}
       </div>
     </section>
   );
 }
 
-function CategoryCircle({
-  category,
-}: {
-  category: (typeof CATEGORIES)[number];
-}) {
+function BigCategoryCard({ category }: { category: BigCategory }) {
   return (
-    <button
+    <motion.button
       type="button"
-      className="group/cat flex w-[88px] shrink-0 cursor-pointer flex-col items-center gap-1.5"
+      whileTap={{ scale: 0.97 }}
+      className={cn(
+        'group/card relative flex h-full w-72 shrink-0 cursor-pointer flex-col overflow-hidden rounded-3xl text-left',
+        'shadow-md transition-shadow duration-300 hover:shadow-xl',
+        category.bg,
+      )}
     >
-      <div className="relative h-[78px] w-[78px] overflow-hidden rounded-full bg-brand-100 ring-2 ring-white shadow-md transition-shadow duration-300 group-hover/cat:shadow-xl">
+      {/* Título arriba */}
+      <div className="shrink-0 px-5 pt-5 pb-3">
+        <h4
+          className={cn(
+            'text-[26px] font-black leading-[1.05] tracking-tight',
+            category.titleColor,
+          )}
+        >
+          {category.titleLines.map((line, i) => (
+            <span key={i} className="block">
+              {line}
+            </span>
+          ))}
+        </h4>
+      </div>
+
+      {/* Imagen ocupa el resto */}
+      <div className="relative min-h-0 flex-1">
         <Image
           src={category.image}
-          alt={category.name}
+          alt={category.imageAlt}
           fill
-          sizes="80px"
-          className="object-cover transition-transform duration-500 group-hover/cat:scale-110"
+          sizes="288px"
+          className="object-cover transition-transform duration-500 group-hover/card:scale-105"
           unoptimized
+          draggable={false}
         />
-        <div
-          className={`pointer-events-none absolute inset-0 rounded-full bg-gradient-to-tr ${category.tint} via-transparent to-transparent opacity-50 mix-blend-multiply`}
-        />
-        <div className="pointer-events-none absolute inset-0 rounded-full ring-0 ring-accent-400/0 transition-all duration-300 group-hover/cat:ring-4 group-hover/cat:ring-accent-400/40" />
       </div>
-      <p className="truncate text-[11px] font-bold tracking-tight text-brand-900 group-hover/cat:text-accent-700">
-        {category.name}
-      </p>
-    </button>
+
+      {/* Chevron flotante esquina superior derecha */}
+      <div className="absolute right-4 top-4 grid h-11 w-11 place-items-center rounded-full bg-white/85 text-brand-700 shadow-sm backdrop-blur-sm transition-colors duration-200 group-hover/card:bg-white group-hover/card:text-accent-700">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m9 18 6-6-6-6" />
+        </svg>
+      </div>
+    </motion.button>
   );
 }

@@ -2,21 +2,52 @@
 
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils/cn';
+import { useDashboardStore } from '@/lib/store/useDashboardStore';
 
-// Marcas oficiales (mock visual; reemplazables por datos reales).
-const BRAND_STORES = [
-  { name: 'Adidas', tag: 'Deporte', initial: 'A', bg: 'bg-black', text: 'text-white' },
-  { name: 'Nestlé', tag: 'Alimentos', initial: 'N', bg: 'bg-red-600', text: 'text-white' },
-  { name: 'Dell', tag: 'Tecnología', initial: 'D', bg: 'bg-blue-600', text: 'text-white' },
-  { name: 'Apple', tag: 'Electrónica', initial: '', bg: 'bg-slate-900', text: 'text-white' },
+// Tiendas asociadas a Tu Negocio en Línea (mock visual; conectable a API después).
+const PARTNER_STORES = [
+  {
+    storeId: 't-bog-01',
+    deptCode: '11',
+    name: 'Tienda Chapinero',
+    city: 'Bogotá D.C.',
+    initial: 'C',
+    bg: 'bg-accent-600',
+  },
+  {
+    storeId: 't-ant-01',
+    deptCode: '05',
+    name: 'Mercado El Poblado',
+    city: 'Medellín',
+    initial: 'M',
+    bg: 'bg-rose-500',
+  },
+  {
+    storeId: 't-vlc-01',
+    deptCode: '76',
+    name: 'Tienda Granada',
+    city: 'Cali',
+    initial: 'G',
+    bg: 'bg-amber-500',
+  },
+  {
+    storeId: 't-atl-02',
+    deptCode: '08',
+    name: 'Punto Norte',
+    city: 'Barranquilla',
+    initial: 'N',
+    bg: 'bg-sky-500',
+  },
 ];
 
 export function HomeIntroCard() {
+  const selectDepartamento = useDashboardStore((s) => s.selectDepartamento);
+  const selectTienda = useDashboardStore((s) => s.selectTienda);
+
   return (
     <section className="relative overflow-hidden rounded-3xl border border-brand-200 bg-white shadow-sm">
       {/* Hero degradado superior */}
       <div className="relative bg-gradient-to-br from-accent-50 via-white to-brand-50 px-6 pb-6 pt-7">
-        {/* Halo verde decorativo */}
         <div className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-accent-200/40 blur-3xl" />
 
         <div className="relative flex flex-col items-center text-center">
@@ -42,19 +73,27 @@ export function HomeIntroCard() {
         </div>
       </div>
 
-      {/* Brand stores */}
+      {/* Tiendas asociadas */}
       <div className="border-t border-brand-200/80 px-5 pb-5 pt-5">
         <div className="mb-3 flex items-baseline justify-between">
           <h3 className="text-[14px] font-bold tracking-tight text-brand-900">
-            Marcas oficiales
+            Tiendas asociadas
           </h3>
           <span className="text-[10px] font-semibold uppercase tracking-widest text-brand-400">
-            Entrega 24h
+            Aliados oficiales
           </span>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          {BRAND_STORES.map((b, i) => (
-            <BrandTile key={b.name} brand={b} index={i} />
+          {PARTNER_STORES.map((s, i) => (
+            <PartnerTile
+              key={s.storeId}
+              store={s}
+              index={i}
+              onSelect={() => {
+                selectDepartamento(s.deptCode);
+                setTimeout(() => selectTienda(s.storeId), 60);
+              }}
+            />
           ))}
         </div>
       </div>
@@ -62,12 +101,14 @@ export function HomeIntroCard() {
   );
 }
 
-function BrandTile({
-  brand,
+function PartnerTile({
+  store,
   index,
+  onSelect,
 }: {
-  brand: (typeof BRAND_STORES)[number];
+  store: (typeof PARTNER_STORES)[number];
   index: number;
+  onSelect: () => void;
 }) {
   return (
     <motion.button
@@ -77,35 +118,27 @@ function BrandTile({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.06 }}
+      onClick={onSelect}
       className={cn(
         'group relative flex min-h-[68px] cursor-pointer items-center gap-3 overflow-hidden rounded-2xl border border-brand-200 bg-white p-3 text-left',
         'shadow-sm transition-shadow duration-200 hover:border-accent-400 hover:shadow-md',
       )}
     >
-      {/* Glow on hover */}
       <span className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-accent-50 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
       <div
         className={cn(
-          'relative grid h-12 w-12 shrink-0 place-items-center rounded-xl shadow-inner',
-          brand.bg,
-          brand.text,
+          'relative grid h-12 w-12 shrink-0 place-items-center rounded-xl text-white shadow-inner',
+          store.bg,
         )}
       >
-        {brand.initial ? (
-          <span className="text-lg font-black">{brand.initial}</span>
-        ) : (
-          // Apple
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17.05 12.04c-.03-2.74 2.24-4.05 2.34-4.12-1.27-1.86-3.25-2.12-3.96-2.15-1.69-.17-3.3 1-4.16 1-.87 0-2.19-.97-3.6-.95-1.85.03-3.55 1.07-4.5 2.73-1.92 3.33-.49 8.25 1.39 10.95.92 1.32 2.01 2.8 3.43 2.75 1.38-.06 1.9-.89 3.57-.89 1.66 0 2.13.89 3.59.86 1.48-.02 2.42-1.34 3.33-2.67 1.05-1.53 1.49-3.01 1.51-3.09-.03-.01-2.91-1.11-2.94-4.42ZM14.41 4.36c.74-.91 1.25-2.16 1.11-3.41-1.07.05-2.39.72-3.16 1.62-.69.81-1.3 2.1-1.14 3.32 1.2.09 2.42-.62 3.19-1.53Z" />
-          </svg>
-        )}
+        <span className="text-lg font-black">{store.initial}</span>
       </div>
       <div className="relative min-w-0 flex-1">
-        <p className="truncate text-[14px] font-bold leading-tight text-brand-900">
-          {brand.name}
+        <p className="truncate text-[13px] font-bold leading-tight text-brand-900">
+          {store.name}
         </p>
-        <p className="truncate text-[11px] text-brand-500">{brand.tag}</p>
+        <p className="truncate text-[11px] text-brand-500">{store.city}</p>
       </div>
       <svg
         width="14"

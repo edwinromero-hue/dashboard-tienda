@@ -3,7 +3,6 @@
 import { motion } from 'framer-motion';
 import { HomeIntroCard } from '@/components/home/HomeIntroCard';
 import { PopularCategoriesCard } from '@/components/home/PopularCategoriesCard';
-import { TopDepartamentosChart } from '@/components/home/TopDepartamentosChart';
 
 export function EmptyPanel() {
   return (
@@ -11,11 +10,14 @@ export function EmptyPanel() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="flex flex-col gap-4 pb-4"
+      className="flex h-full min-h-0 flex-col gap-4"
     >
-      <HomeIntroCard />
+      {/* Intro: altura natural, no se encoge */}
+      <div className="shrink-0">
+        <HomeIntroCard />
+      </div>
+      {/* Categorías: ocupa todo el espacio restante hasta abajo */}
       <PopularCategoriesCard />
-      <TopDepartamentosChart />
     </motion.div>
   );
 }
