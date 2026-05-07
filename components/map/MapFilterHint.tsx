@@ -47,11 +47,11 @@ export function MapFilterHint() {
       {expanded ? (
         <motion.div
           key="expanded"
-          initial={{ opacity: 0, y: -6, scale: 0.92 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.4, x: -10, transition: { duration: 0.3 } }}
+          initial={{ opacity: 0, y: -6, scale: 0.92, x: '-50%' }}
+          animate={{ opacity: 1, y: 0, scale: 1, x: '-50%' }}
+          exit={{ opacity: 0, scale: 0.4, x: '-50%', transition: { duration: 0.3 } }}
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="pointer-events-none absolute left-20 top-5 z-20 inline-flex items-center gap-2.5 rounded-full bg-white/95 px-4 py-2 shadow-md ring-1 ring-brand-200 backdrop-blur-md"
+          className="pointer-events-none absolute left-1/2 top-5 z-20 inline-flex items-center gap-2.5 rounded-full bg-white/95 px-4 py-2 shadow-md ring-1 ring-brand-200 backdrop-blur-md"
         >
           <Dot />
           <span className="flex flex-col leading-tight">
@@ -68,12 +68,12 @@ export function MapFilterHint() {
           key="collapsed"
           type="button"
           onClick={handleTapDot}
-          initial={{ opacity: 0, scale: 0.4 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.4 }}
+          initial={{ opacity: 0, scale: 0.4, x: '-50%' }}
+          animate={{ opacity: 1, scale: 1, x: '-50%' }}
+          exit={{ opacity: 0, scale: 0.4, x: '-50%' }}
           transition={{ duration: 0.3, ease: 'easeOut' }}
-          whileTap={{ scale: 0.88 }}
-          className="absolute left-20 top-5 z-20 grid h-9 w-9 cursor-pointer place-items-center rounded-full bg-white/90 shadow-md ring-1 ring-brand-200 backdrop-blur-md transition-shadow duration-200 hover:shadow-lg"
+          whileTap={{ scale: 0.88, x: '-50%' }}
+          className="absolute left-1/2 top-5 z-20 grid h-9 w-9 cursor-pointer place-items-center rounded-full bg-white/90 shadow-md ring-1 ring-brand-200 backdrop-blur-md transition-shadow duration-200 hover:shadow-lg"
           aria-label="Mostrar instrucción del filtro"
         >
           <Dot />

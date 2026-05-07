@@ -8,7 +8,7 @@ import Map, {
   type MapLayerMouseEvent,
   type MapRef,
   type LayerProps,
-} from 'react-map-gl/maplibre';
+} from 'react-map-gl';
 import { motion } from 'framer-motion';
 import { useDashboardStore } from '@/lib/store/useDashboardStore';
 import {
@@ -66,6 +66,36 @@ export default function ColombiaMapInner() {
   const idle = useIdleStore((s) => s.idle);
 
   const inDeptView = !selectedDepartamento;
+
+  // Fix de rendering parcial: cuando el contenedor cambia de tamaño
+  // (transiciones del layout, idle ↔ activo, resize de ventana), Mapbox no
+  // recalcula el viewport solo. Fuerza resize() en cada cambio de tamaño y
+  // tras cada transición CSS, además de varias veces en los primeros 800ms
+  // por si el mapa monta antes de que el contenedor tenga su size final.
+  const onMapLoad = useCallback(() => {
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+    // Múltiples resize en cascada: cubre el caso de transiciones de 700ms
+    [50, 200, 500, 800].forEach((ms) => setTimeout(() => map.resize(), ms));
+  }, []);
+
+  useEffect(() => {
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+    const container = map.getContainer();
+    const ro = new ResizeObserver(() => map.resize());
+    ro.observe(container);
+    // También observamos el padre directo (que es quien cambia con el layout)
+    if (container.parentElement) ro.observe(container.parentElement);
+    return () => ro.disconnect();
+  }, []);
+
+  // Re-resize cuando entra/sale del modo idle (después de la transición de 700ms)
+  useEffect(() => {
+    const map = mapRef.current?.getMap();
+    if (!map) return;
+    [50, 350, 750, 1000].forEach((ms) => setTimeout(() => map.resize(), ms));
+  }, [idle]);
 
   // Cargar GeoJSON de departamentos + counts
   useEffect(() => {
@@ -412,9 +442,11 @@ export default function ColombiaMapInner() {
       <Map
         ref={mapRef}
         initialViewState={COLOMBIA_VIEW}
-        mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+        mapStyle="mapbox://styles/mapbox/light-v11"
+        mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         interactiveLayerIds={interactiveLayerIds}
         cursor={hoverInfo ? 'pointer' : 'grab'}
+        onLoad={onMapLoad}
         onMouseMove={onHover}
         onMouseLeave={onMouseLeave}
         onClick={onClick}

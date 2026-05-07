@@ -51,17 +51,17 @@
     animation: shimmer 1.8s infinite linear;
   }
 
-  /* MapLibre popup overrides */
-  .maplibregl-popup-content {
+  /* Mapbox popup overrides */
+  .mapboxgl-popup-content {
     @apply rounded-xl border border-brand-200 bg-white px-3 py-2 shadow-lg;
     font-family: var(--font-inter);
   }
 
-  .maplibregl-popup-tip {
+  .mapboxgl-popup-tip {
     border-top-color: white !important;
   }
 
-  .maplibregl-ctrl-group {
+  .mapboxgl-ctrl-group {
     @apply rounded-xl border border-brand-200 shadow-md;
   }
 }

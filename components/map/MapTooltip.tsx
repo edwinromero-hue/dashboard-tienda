@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Popup } from 'react-map-gl/maplibre';
+import { Popup } from 'react-map-gl';
 
 export function MapTooltip({
   longitude,

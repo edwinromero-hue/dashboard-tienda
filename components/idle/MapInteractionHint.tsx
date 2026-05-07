@@ -7,11 +7,11 @@ import { motion } from 'framer-motion';
 export function MapInteractionHint() {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 16, x: '-50%' }}
+      animate={{ opacity: 1, y: 0, x: '-50%' }}
+      exit={{ opacity: 0, y: 16, x: '-50%' }}
       transition={{ duration: 0.6, delay: 0.3 }}
-      className="pointer-events-none absolute bottom-16 left-1/2 z-30 -translate-x-1/2"
+      className="pointer-events-none absolute bottom-16 left-1/2 z-30"
     >
       <div className="relative flex items-center justify-center gap-4 overflow-hidden rounded-full bg-slate-950/65 px-8 py-3.5 backdrop-blur-xl ring-1 ring-white/20 shadow-[0_12px_44px_-10px_rgba(60,160,80,0.6),inset_0_1px_0_rgba(255,255,255,0.18)]">
         {/* Halo verde superior */}

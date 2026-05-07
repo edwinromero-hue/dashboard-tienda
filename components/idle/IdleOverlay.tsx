@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import type { MapRef } from 'react-map-gl/maplibre';
+import type { MapRef } from 'react-map-gl';
 import { api, type FeaturedProduct } from '@/lib/api/client';
 import { useIdleStore } from '@/lib/store/useIdleStore';
 import {
