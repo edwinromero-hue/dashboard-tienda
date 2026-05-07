@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+    color: theme('colors.brand.900');
+    background-color: theme('colors.brand.50');
+  }
+
+  /* Patrón sutil de puntos para dar textura sin distraer */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-image:
+      radial-gradient(circle at 20% 0%, rgba(140, 198, 63, 0.06), transparent 50%),
+      radial-gradient(circle at 100% 100%, rgba(45, 107, 58, 0.04), transparent 40%),
+      radial-gradient(rgba(15, 23, 42, 0.04) 1px, transparent 1px);
+    background-size: auto, auto, 28px 28px;
+    background-position: 0 0, 0 0, 0 0;
+  }
+
+  /* Scrollbars finos y discretos */
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: theme('colors.brand.200');
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: theme('colors.brand.300');
+  }
+}
+
+@layer components {
+  .shimmer-bg {
+    background-image: linear-gradient(
+      90deg,
+      rgba(226, 232, 240, 0.4) 0%,
+      rgba(226, 232, 240, 0.9) 50%,
+      rgba(226, 232, 240, 0.4) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite linear;
+  }
+
+  /* MapLibre popup overrides */
+  .maplibregl-popup-content {
+    @apply rounded-xl border border-brand-200 bg-white px-3 py-2 shadow-lg;
+    font-family: var(--font-inter);
+  }
+
+  .maplibregl-popup-tip {
+    border-top-color: white !important;
+  }
+
+  .maplibregl-ctrl-group {
+    @apply rounded-xl border border-brand-200 shadow-md;
+  }
+}
